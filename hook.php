@@ -116,7 +116,8 @@ if($userName != ""){
 }
 
 function run_shell_cmd($cmd, $param) {
-    exec("$cmd $param", $output, $status);
+    $cmd = sprintf($cmd, $param);
+    exec("$cmd", $output, $status);
     $msg = '@' . $GLOBALS['userName'] . PHP_EOL;
     foreach($output as $line){
         $msg .= $line . PHP_EOL;
@@ -125,41 +126,32 @@ function run_shell_cmd($cmd, $param) {
 }
 
 function ping($host){
-    if(filter_var($host, FILTER_VALIDATE_IP)){
-        run_shell_cmd('timeout 30 /bin/ping -c 4', $host);
-    }elseif(filter_var(gethostbyname($host), FILTER_VALIDATE_IP)){
-        run_shell_cmd('timeout 30 /bin/ping -c 4', $host);
-    }elseif(is_domain($host)){
-        run_shell_cmd('timeout 30 /bin/ping -c 4', $host);
-    }else{
+
+    if( filter_var($host, FILTER_VALIDATE_IP) &&
+        filter_var(gethostbyname($host), FILTER_VALIDATE_IP) &&
+        is_domain($host)) {
+
+        run_shell_cmd('timeout 30 /bin/ping -c 4 %s', $host);
+
+    } else {
+
         error(4);
+
     }
 }
 
 function ping6($host){
-    if(filter_var($host, FILTER_VALIDATE_IP)){
-        exec("timeout 30 /bin/ping6 -c 4 $host", $output, $status);
-        $msg = '@' . $GLOBALS['userName'] . PHP_EOL;
-        foreach($output as $line){
-            $msg .= $line . PHP_EOL;
-        }
-        sendMsg($msg);
-    }elseif(filter_var(gethostbyname($host), FILTER_VALIDATE_IP)){
-        exec("timeout 30 /bin/ping6 -c 4 $host", $output, $status);
-        $msg = '@' . $GLOBALS['userName'] . PHP_EOL;
-        foreach($output as $line){
-            $msg .= $line . PHP_EOL;
-        }
-        sendMsg($msg);
-    }elseif(is_domain($host)){
-        exec("timeout 30 /bin/ping6 -c 4 $host", $output, $status);
-        $msg = '@' . $GLOBALS['userName'] . PHP_EOL;
-        foreach($output as $line){
-            $msg .= $line . PHP_EOL;
-        }
-        sendMsg($msg);
-    }else{
+
+    if( filter_var($host, FILTER_VALIDATE_IP) &&
+        filter_var(gethostbyname($host), FILTER_VALIDATE_IP) &&
+        is_domain($host)) {
+
+        run_shell_cmd('timeout 30 /bin/ping6 -c 4 %s', $host);
+
+    } else {
+
         error(4);
+        
     }
 }
 
