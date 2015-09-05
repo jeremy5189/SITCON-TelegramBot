@@ -39,7 +39,7 @@ if($userName != ""){
     if(substr($message, 0, 1) == "/"){
         if( true ) { // For user check
             $message = strtolower($message);
-            $cmd = str_replace('@'.BOTNAME, '', $message);
+            $cmd = str_replace('@'.BOT_NAME, '', $message);
             $cmd = split(' ', $cmd);
 
             switch ($cmd[0]) {
@@ -122,11 +122,11 @@ if($userName != ""){
                     break;
 
                 case "/log":
-                    git("log");
+                    git('log --pretty=format:"%h - %an, %ar : %s"');
                     break;
 
                 default:
-                    if(strpos($message, "@".BOTNAME)){
+                    if(strpos($message, "@".BOT_NAME)){
                         sendMsg("我沒這指令, 你想做什麼??");
                     }
                     //error(3);
@@ -137,15 +137,17 @@ if($userName != ""){
             error(2);
         }
     }else{
-        if(strpos($message, "@".BOTNAME) !== false){
+        if(strpos($message, "@".BOT_NAME) !== false){
             sendMsg("嗨~ Tag 我幹嘛?");
         }
     }
 }
 
-function run_shell_cmd($cmd, $param) {
+function run_shell_cmd($cmd, $param, $do_sprint = true) {
 
-    $cmd = sprintf($cmd, $param);
+    if($do_sprint)
+        $cmd = sprintf($cmd, $param);
+
     logging("Shell Command: " . $cmd);
 
     exec("$cmd", $output, $status);
@@ -248,7 +250,7 @@ function whois($host){
 }
 
 function git($git_cmd) {
-    run_shell_cmd("git $git_cmd", '');
+    run_shell_cmd("git $git_cmd", '', false);
 }
 
 function moo() {
