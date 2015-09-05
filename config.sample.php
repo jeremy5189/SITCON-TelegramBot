@@ -1,5 +1,6 @@
 <?php
 define('TOKEN', '');
+define('BOTNAME', '');
 
 $users = array(
     00000000, // Telegram User ID

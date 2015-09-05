@@ -24,7 +24,7 @@ if($userName != ""){
     if(substr($message, 0, 1) == "/"){
         if(in_array($fromID, $users)){
             $message = strtolower($message);
-            $cmd = str_replace('@cprteam2_bot', '', $message);
+            $cmd = str_replace('@'.BOTNAME, '', $message);
             $cmd = split(' ', $cmd);
 
             switch ($cmd[0]) {
@@ -97,7 +97,7 @@ if($userName != ""){
 		    moo();
                     break;
                 default:
-                    if(strpos($message, "@cprteam2_bot")){
+                    if(strpos($message, "@".BOTNAME)){
                         sendMsg("我沒這指令, 你想做什麼??");
                     }
                     //error(3);
@@ -107,7 +107,7 @@ if($userName != ""){
             error(2);
         }
     }else{
-        if(strpos($message, "@cprteam2_bot") !== false){
+        if(strpos($message, "@".BOTNAME) !== false){
             sendMsg("嗨~ Tag 我幹嘛?");
         }
     }
