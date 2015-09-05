@@ -38,8 +38,10 @@ $message = $data['message']['text'];
 if($userName != ""){
     if(substr($message, 0, 1) == "/"){
         if( true ) { // For user check
-            $message = strtolower($message);
+
             $cmd = str_replace('@'.BOT_NAME, '', $message);
+            $message = strtolower($message);
+            logging($cmd);
             $cmd = split(' ', $cmd);
 
             switch ($cmd[0]) {
