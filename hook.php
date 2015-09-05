@@ -268,53 +268,7 @@ function help($cmd_list){
 }
 
 function search($u, $i){
-    $search_user_id = 0;
-
-    if (in_array($u, array('肚子很黑的傢伙', '腹黑', '腹黑い茶', '腹黒', '腹黒い茶', '負黑', '負黑い茶', '負黒', '負黒い茶'))) {
-        $search_user_id = 39721210;
-    }elseif (in_array($u, array('frank', 'frankwu', 'fluke'))) {
-        $search_user_id = 32469767;
-    }elseif (in_array($u, array('penny', 'pennyken', '黃天建'))) {
-        $search_user_id = 45951056;
-    }elseif (in_array($u, array('mousems', 'mouse', '老鼠'))) {
-        $search_user_id = 35745250;
-    }elseif (in_array($u, array('胖胖', 'ptc'))) {
-        $search_user_id = 37050310;
-    }else {
-        sendMsg('找不到該用戶. /search {name} {type}');
-    }
-        
-    if ($search_user_id != 0) {
-        if (in_array($i, array('phone', 'cellphone'))) {
-            sendMsg(search2($search_user_id, 'cellphone'));
-        }else if (in_array($i, array('email', 'mail'))) {
-            sendMsg(search2($search_user_id, 'email'));
-        }else {
-            sendMsg('你要查什麼? ex. email, phone, etc...');
-        }
-    }
-}
-
-function search2($user_id, $type){
-    global $userArray;
-    
-    $result = $userArray[$user_id]["nickname"] . "'s " . $type . ": ";
-    
-    $ans = $userArray[$user_id][$type];
-    
-    if ($ans[0] != '') {
-        $result .= $ans[0];
-        
-        $i = 1;
-        while ($ans[$i] != '') {
-            $result .= ", " . $ans[$i];
-            $i .= 1;
-        }
-    }
-    else {
-        $result .= "Not found";
-    }
-    return $result . '.';
+    return null;
 }
 
 function is_domain($d,$clean=false){
