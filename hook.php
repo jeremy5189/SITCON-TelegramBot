@@ -5,6 +5,19 @@ header('Accept: application/json');
 
 include_once('config.php');
 
+$cmd_list = array(
+    'ping',
+    'traceroute',
+    'nslookup',
+    'whois',
+    'test',
+    'help',
+    'moo',
+    'pull',
+    'status',
+    'log'
+);
+
 // Get telegram data
 $json = file_get_contents('php://input') . PHP_EOL;
 $data = json_decode($json, true);
@@ -24,7 +37,7 @@ $message = $data['message']['text'];
 
 if($userName != ""){
     if(substr($message, 0, 1) == "/"){
-        if(in_array($fromID, $users)){
+        if( true ) { // For user check
             $message = strtolower($message);
             $cmd = str_replace('@'.BOTNAME, '', $message);
             $cmd = split(' ', $cmd);
@@ -38,13 +51,13 @@ if($userName != ""){
                     }
                     break;
 
-                case "/ping6":
+                /*case "/ping6":
                     if(count($cmd) == 2){
                         ping6($cmd[1]); 
                     }else{
                         error(4);
                     }
-                    break;
+                    break;*/
 
                 case "/traceroute":
                     if(count($cmd) == 2){
@@ -54,13 +67,13 @@ if($userName != ""){
                     }
                     break;
 
-                case "/traceroute6":
+                /*case "/traceroute6":
                     if(count($cmd) == 2){
                         traceroute6($cmd[1]);
                     }else{
                         error(4);
                     }
-                    break;
+                    break;*/
                 
                 case "/nslookup":
                     if(count($cmd) == 3){
@@ -85,19 +98,33 @@ if($userName != ""){
                     break;
 
                 case "/help":
-                    help();
+                    help($cmd_list);
                     break;
 
-                case "/search":
+                /*case "/search":
                     if(count($cmd) == 3){
                         search($cmd[1], $cmd[2]);
                     }else{
                         error(4);
                     }
-                    break;
+                    break;*/
+
                 case "/moo":
 		            moo();
                     break;
+
+                case "/pull":
+                    git("pull github master");
+                    break;
+
+                case "/status":
+                    git("status");
+                    break;
+
+                case "/log":
+                    git("log");
+                    break;
+
                 default:
                     if(strpos($message, "@".BOTNAME)){
                         sendMsg("我沒這指令, 你想做什麼??");
@@ -105,6 +132,7 @@ if($userName != ""){
                     //error(3);
                     break;
             }
+
         }else{
             error(2);
         }
@@ -116,7 +144,10 @@ if($userName != ""){
 }
 
 function run_shell_cmd($cmd, $param) {
+
     $cmd = sprintf($cmd, $param);
+    logging("Shell Command: " . $cmd);
+
     exec("$cmd", $output, $status);
     $msg = '@' . $GLOBALS['userName'] . PHP_EOL;
     foreach($output as $line){
@@ -125,10 +156,10 @@ function run_shell_cmd($cmd, $param) {
     sendMsg($msg);
 }
 
-function ping($host){
+function ping($host) {
 
-    if( filter_var($host, FILTER_VALIDATE_IP) &&
-        filter_var(gethostbyname($host), FILTER_VALIDATE_IP) &&
+    if( filter_var($host, FILTER_VALIDATE_IP) ||
+        filter_var(gethostbyname($host), FILTER_VALIDATE_IP) ||
         is_domain($host)) {
 
         run_shell_cmd('timeout 30 /bin/ping -c 4 %s', $host);
@@ -140,10 +171,10 @@ function ping($host){
     }
 }
 
-function ping6($host){
+function ping6($host) {
 
-    if( filter_var($host, FILTER_VALIDATE_IP) &&
-        filter_var(gethostbyname($host), FILTER_VALIDATE_IP) &&
+    if( filter_var($host, FILTER_VALIDATE_IP) ||
+        filter_var(gethostbyname($host), FILTER_VALIDATE_IP) ||
         is_domain($host)) {
 
         run_shell_cmd('timeout 30 /bin/ping6 -c 4 %s', $host);
@@ -155,133 +186,85 @@ function ping6($host){
     }
 }
 
-function traceroute($host){
-    if(filter_var($host, FILTER_VALIDATE_IP)){
-        exec("timeout 30 /usr/bin/traceroute -n -w 15 $host | grep -vi '* * *'", $output, $status);
-        $msg = '@' . $GLOBALS['userName'] . PHP_EOL;
-        foreach($output as $line){
-            $msg .= $line . PHP_EOL;
-        }
-        sendMsg($msg);
-    }elseif(filter_var(gethostbyname($host), FILTER_VALIDATE_IP)){
-        exec("timeout 30 /usr/bin/traceroute -n -w 15 $host | grep -vi '* * *'", $output, $status);
-        $msg = '@' . $GLOBALS['userName'] . PHP_EOL;
-        foreach($output as $line){
-            $msg .= $line . PHP_EOL;
-        }
-        sendMsg($msg);
-    }elseif(is_domain($host)){
-        exec("timeout 30 /usr/bin/traceroute -n -w 15 $host | grep -vi '* * *'", $output, $status);
-        $msg = '@' . $GLOBALS['userName'] . PHP_EOL;
-        foreach($output as $line){
-            $msg .= $line . PHP_EOL;
-        }
-        sendMsg($msg);
-    }else{
+function traceroute($host)  {
+
+    if( filter_var($host, FILTER_VALIDATE_IP) ||
+        filter_var(gethostbyname($host), FILTER_VALIDATE_IP) ||
+        is_domain($host)) {
+
+        run_shell_cmd("timeout 30 /usr/bin/traceroute -n -w 15 %s | grep -vi '* * *'", $host);
+
+    } else {
+
         error(4);
+        
     }
 }
 
-function traceroute6($host){
-    if(filter_var($host, FILTER_VALIDATE_IP)){
-        exec("timeout 30 /usr/bin/traceroute6 -n -w 15 $host | grep -vi '* * *'", $output, $status);
-        $msg = '@' . $GLOBALS['userName'] . PHP_EOL;
-        foreach($output as $line){
-            $msg .= $line . PHP_EOL;
-        }
-        sendMsg($msg);
-    }elseif(filter_var(gethostbyname($host), FILTER_VALIDATE_IP)){
-        exec("timeout 30 /usr/bin/traceroute6 -n -w 15 $host | grep -vi '* * *'", $output, $status);
-        $msg = '@' . $GLOBALS['userName'] . PHP_EOL;
-        foreach($output as $line){
-            $msg .= $line . PHP_EOL;
-        }
-        sendMsg($msg);
-    }elseif(is_domain($host)){
-        exec("timeout 30 /usr/bin/traceroute6 -n -w 15 $host | grep -vi '* * *'", $output, $status);
-        $msg = '@' . $GLOBALS['userName'] . PHP_EOL;
-        foreach($output as $line){
-            $msg .= $line . PHP_EOL;
-        }
-        sendMsg($msg);
-    }else{
+function traceroute6($host) {
+
+    if( filter_var($host, FILTER_VALIDATE_IP) ||
+        filter_var(gethostbyname($host), FILTER_VALIDATE_IP) ||
+        is_domain($host)) {
+
+        run_shell_cmd("timeout 30 /usr/bin/traceroute6 -n -w 15 %s | grep -vi '* * *'", $host);
+
+    } else {
+
         error(4);
+        
     }
+
 }
 
-function nslookup($host, $server = "8.8.8.8"){
-    if(filter_var($host, FILTER_VALIDATE_IP)){
-        exec("timeout 30 /usr/bin/nslookup $host $server", $output, $status);
-        $msg = '@' . $GLOBALS['userName'] . PHP_EOL;
-        foreach($output as $line){
-            $msg .= $line . PHP_EOL;
-        }
-        sendMsg($msg);
-    }elseif(filter_var(gethostbyname($host), FILTER_VALIDATE_IP)){
-        exec("timeout 30 /usr/bin/nslookup $host $server", $output, $status);
-        $msg = '@' . $GLOBALS['userName'] . PHP_EOL;
-        foreach($output as $line){
-            $msg .= $line . PHP_EOL;
-        }
-        sendMsg($msg);
-    }elseif(is_domain($host)){
-        exec("timeout 30 /usr/bin/nslookup $host $server", $output, $status);
-        $msg = '@' . $GLOBALS['userName'] . PHP_EOL;
-        foreach($output as $line){
-            $msg .= $line . PHP_EOL;
-        }
-        sendMsg($msg);
-    }else{
+function nslookup($host, $server = "8.8.8.8") {
+
+    if( filter_var($host, FILTER_VALIDATE_IP) ||
+        filter_var(gethostbyname($host), FILTER_VALIDATE_IP) ||
+        is_domain($host)) {
+
+        run_shell_cmd('timeout 30 /usr/bin/nslookup %s', $host . ' ' . $server);
+
+    } else {
+
         error(4);
+        
     }
 }
 
 function whois($host){
-    if(filter_var($host, FILTER_VALIDATE_IP)){
-        exec("timeout 30 /usr/bin/whois $host", $output, $status);
-        $msg = '@' . $GLOBALS['userName'] . PHP_EOL;
-        foreach($output as $line){
-            $msg .= $line . PHP_EOL;
-        }
-        sendMsg($msg);
-    }elseif(filter_var(gethostbyname($host), FILTER_VALIDATE_IP)){
-        exec("timeout 30 /usr/bin/whois $host", $output, $status);
-        $msg = '@' . $GLOBALS['userName'] . PHP_EOL;
-        foreach($output as $line){
-            $msg .= $line . PHP_EOL;
-        }
-        sendMsg($msg);
-    }elseif(is_domain($host)){
-        exec("timeout 30 /usr/bin/whois $host", $output, $status);
-        $msg = '@' . $GLOBALS['userName'] . PHP_EOL;
-        foreach($output as $line){
-            $msg .= $line . PHP_EOL;
-        }
-        sendMsg($msg);
-    }else{
+
+    if( filter_var($host, FILTER_VALIDATE_IP) ||
+        filter_var(gethostbyname($host), FILTER_VALIDATE_IP) ||
+        is_domain($host)) {
+
+        run_shell_cmd('timeout 30 /usr/bin/whois %s', $host . ' ' . $server);
+
+    } else {
+
         error(4);
+        
     }
+}
+
+function git($git_cmd) {
+    run_shell_cmd("git $git_cmd", '');
 }
 
 function moo() {
-    exec("apt-get moo", $output, $status);
-    $msg = '@' . $GLOBALS['userName'] . PHP_EOL;
-    foreach($output as $line){
-        $msg .= $line . PHP_EOL;
-    }
-    sendMsg($msg);
+    run_shell_cmd('apt-get moo');
 }
 
 function test(){
-    if ($fromID == "39721210") {
-        sendMsg("阿!!!");
-    }else{
-        sendMsg("Just Test!");      
-    }
+    sendMsg('安安你好我是機器人');
 }
 
-function help(){
-    sendMsg("嗨~還在開發中喔~");
+function help($cmd_list){
+    $str = 'Available Command' . "\n";
+    foreach( $cmd_list as $cmd ) {
+        $str .= "/$cmd\n";
+    }
+    sendMsg($str);
 }
 
 function search($u, $i){
