@@ -5,9 +5,11 @@ header('Accept: application/json');
 
 include_once('config.php');
 
+// Get telegram data
 $json = file_get_contents('php://input') . PHP_EOL;
 $data = json_decode($json, true);
 
+// Log it
 $time = date('Y-m-d H:i:s', time());
 logging("<" .$time . "> Hook invoked\n");
 logging($data);
@@ -94,7 +96,7 @@ if($userName != ""){
                     }
                     break;
                 case "/moo":
-		    moo();
+		            moo();
                     break;
                 default:
                     if(strpos($message, "@".BOTNAME)){
@@ -113,28 +115,22 @@ if($userName != ""){
     }
 }
 
+function run_shell_cmd($cmd, $param) {
+    exec("$cmd $param", $output, $status);
+    $msg = '@' . $GLOBALS['userName'] . PHP_EOL;
+    foreach($output as $line){
+        $msg .= $line . PHP_EOL;
+    }
+    sendMsg($msg);
+}
+
 function ping($host){
     if(filter_var($host, FILTER_VALIDATE_IP)){
-        exec("timeout 30 /bin/ping -c 4 $host", $output, $status);
-        $msg = '@' . $GLOBALS['userName'] . PHP_EOL;
-        foreach($output as $line){
-            $msg .= $line . PHP_EOL;
-        }
-        sendMsg($msg);
+        run_shell_cmd('timeout 30 /bin/ping -c 4', $host);
     }elseif(filter_var(gethostbyname($host), FILTER_VALIDATE_IP)){
-        exec("timeout 30 /bin/ping -c 4 $host", $output, $status);
-        $msg = '@' . $GLOBALS['userName'] . PHP_EOL;
-        foreach($output as $line){
-            $msg .= $line . PHP_EOL;
-        }
-        sendMsg($msg);
+        run_shell_cmd('timeout 30 /bin/ping -c 4', $host);
     }elseif(is_domain($host)){
-        exec("timeout 30 /bin/ping -c 4 $host", $output, $status);
-        $msg = '@' . $GLOBALS['userName'] . PHP_EOL;
-        foreach($output as $line){
-            $msg .= $line . PHP_EOL;
-        }
-        sendMsg($msg);
+        run_shell_cmd('timeout 30 /bin/ping -c 4', $host);
     }else{
         error(4);
     }
