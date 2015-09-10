@@ -3,6 +3,8 @@ set_time_limit(60);
 date_default_timezone_set('Asia/Taipei');
 header('Accept: application/json');
 
+srand(time());
+
 include_once('config.php');
 
 $cmd_list = array(
@@ -15,7 +17,20 @@ $cmd_list = array(
     'moo',
     'pull',
     'status',
-    'log'
+    'log',
+    'curl',
+    'burn',
+    '燒毀',
+);
+
+$dict = array(
+    '靈的轉移',
+    '巫術的權勢',
+    '被東方閃電擄去了',
+    '耶穌的寶血塗抹潔淨！聖靈的活水沖洗乾淨！',
+    '拿勝利寶劍！',
+    '斷開魂結，斷開鎖鏈！斷開一切的牽連！',
+    '燒毀同性戀的網羅'
 );
 
 // Get telegram data
@@ -36,7 +51,8 @@ $userName = $data['message']['from']['username'];
 $message = $data['message']['text'];
 
 if($userName != ""){
-    if(substr($message, 0, 1) == "/"){
+    
+    if(substr($message, 0, 1) == "/") {
         if( true ) { // For user check
 
             $cmd = str_replace('@'.BOT_NAME, '', $message);
@@ -99,6 +115,11 @@ if($userName != ""){
                     test();
                     break;
 
+                case "/curl":
+                    curl($cmd[1]);
+                    //run_shell_cmd('curl %s', $cmd[1]);
+                    break;
+
                 case "/help":
                     help($cmd_list);
                     break;
@@ -127,6 +148,11 @@ if($userName != ""){
                     git('log --pretty=format:"%h - %an, %ar : %s"');
                     break;
 
+                case "/burn":
+                case "/燒毀":
+                    burn($dict);
+                    break;
+
                 default:
                     if(strpos($message, "@".BOT_NAME)){
                         sendMsg("我沒這指令, 你想做什麼??");
@@ -138,11 +164,45 @@ if($userName != ""){
         }else{
             error(2);
         }
-    }else{
+    }
+    else {
+
+        // 訊息不是 / 開頭
+
         if(strpos($message, "@".BOT_NAME) !== false){
             sendMsg("嗨~ Tag 我幹嘛?");
         }
+
+        if ( preg_match('/[Ss][Ii][Tt][Cc][Oo][Nn][f]{0,1}/',$message) === 1 && 
+             preg_match('/SITCON/',$message) !== 1 ) {
+             $msg = '@' .$userName . PHP_EOL;
+             $msg = ' SITCON 全大寫！';
+             sendMsg($msg);
+        }
     }
+}
+
+function curl($url) {
+
+    if( filter_var($url, FILTER_VALIDATE_IP) ||
+        filter_var(gethostbyname($url), FILTER_VALIDATE_IP) ||
+        is_domain($url)) {
+
+        run_shell_cmd('curl %s', $url);
+
+    } else {
+
+        error(4);
+        
+    }
+}
+
+function burn($burn_dict) {
+
+    $index = rand(0, count($burn_dict));
+
+    sendMsg($burn_dict[$index]);
+
 }
 
 function run_shell_cmd($cmd, $param, $do_sprint = true) {
