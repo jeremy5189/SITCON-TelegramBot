@@ -8,10 +8,10 @@ srand(time());
 include_once('config.php');
 
 $cmd_list = array(
-    'ping',
-    'traceroute',
-    'nslookup',
-    'whois',
+    'ping (!群組)',
+    'traceroute (!群組)',
+    'nslookup (!群組)',
+    'whois (!群組)',
     'test',
     'help',
     'moo',
@@ -62,6 +62,9 @@ if($userName != ""){
 
             switch ($cmd[0]) {
                 case "/ping":
+                    if(intval($chatID) < 0)
+                        break;
+
                     if(count($cmd) == 2){
                         ping($cmd[1]);  
                     }else{
@@ -78,6 +81,8 @@ if($userName != ""){
                     break;*/
 
                 case "/traceroute":
+                    if(intval($chatID) < 0)
+                        break;
                     if(count($cmd) == 2){
                         traceroute($cmd[1]);
                     }else{
@@ -94,6 +99,8 @@ if($userName != ""){
                     break;*/
                 
                 case "/nslookup":
+                    if(intval($chatID) < 0)
+                        break;
                     if(count($cmd) == 3){
                         nslookup($cmd[1], $cmd[2]);
                     }if(count($cmd) == 2){
@@ -104,6 +111,8 @@ if($userName != ""){
                     break;
 
                 case "/whois":
+                    if(intval($chatID) < 0)
+                        break;
                     if(count($cmd) == 2){
                         whois($cmd[1]);
                     }else{
@@ -283,9 +292,12 @@ function traceroute6($host) {
 
 function nslookup($host, $server = "8.8.8.8") {
 
-    if( filter_var($host, FILTER_VALIDATE_IP) ||
-        filter_var(gethostbyname($host), FILTER_VALIDATE_IP) ||
-        is_domain($host)) {
+    if ((filter_var($host, FILTER_VALIDATE_IP) ||
+         filter_var(gethostbyname($host), FILTER_VALIDATE_IP) ||
+         is_domain($host) 
+        ) && (
+         filter_var($server, FILTER_VALIDATE_IP)
+        )) {
 
         run_shell_cmd('timeout 30 /usr/bin/nslookup %s', $host . ' ' . $server);
 
