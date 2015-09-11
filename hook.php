@@ -18,7 +18,7 @@ $cmd_list = array(
     'pull',
     'status',
     'log',
-    'curl',
+    'keygen (Message bot first)',
     'burn',
     '燒毀',
 );
@@ -162,6 +162,10 @@ if($userName != ""){
                     burn($dict);
                     break;
 
+                case "/keygen":
+                    keygen();
+                    break;
+
                 default:
                     if(strpos($message, "@".BOT_NAME)){
                         sendMsg("我沒這指令, 你想做什麼??");
@@ -191,13 +195,19 @@ if($userName != ""){
     }
 }
 
+function keygen() {
+    $uniq = sha1(time().uniqid());
+    run_shell_cmd("ssh-keygen -t rsa -b 1024 -f /tmp/%s.key -N ''", $uniq);
+    run_shell_cmd("cat /tmp/%s.key.pub", $uniq);
+    run_shell_cmd("cat /tmp/%s.key", $uniq, true, true);
+}
+
 function curl($url) {
 
-    if( filter_var($url, FILTER_VALIDATE_IP) ||
-        filter_var(gethostbyname($url), FILTER_VALIDATE_IP) ||
-        is_domain($url)) {
+    if( filter_var($url, FILTER_VALIDATE_URL) ) {
 
-        run_shell_cmd('curl %s', $url);
+        //run_shell_cmd('curl %s', $url);
+        sendMsg('維修中...');
 
     } else {
 
@@ -214,7 +224,7 @@ function burn($burn_dict) {
 
 }
 
-function run_shell_cmd($cmd, $param, $do_sprint = true) {
+function run_shell_cmd($cmd, $param, $do_sprint = true, $private = false) {
 
     if($do_sprint)
         $cmd = sprintf($cmd, $param);
@@ -226,7 +236,11 @@ function run_shell_cmd($cmd, $param, $do_sprint = true) {
     foreach($output as $line){
         $msg .= $line . PHP_EOL;
     }
-    sendMsg($msg);
+
+    if($private)
+        sendPrivateMsg($msg);
+    else
+        sendMsg($msg);
 }
 
 function ping($host) {
@@ -359,6 +373,14 @@ function sendMsg($m){
     $mid = $GLOBALS['messageID'];
     $m = urlencode($m);
     $ch = curl_init("https://api.telegram.org/bot" . TOKEN . "/sendMessage?chat_id=" . $cid . "&reply_to_message_id=" . $mid . "&text=" . $m);
+    curl_exec($ch);
+    curl_close($ch);
+}
+
+function sendPrivateMsg($m){
+    $cid = $GLOBALS['fromID'];
+    $m = urlencode($m);
+    $ch = curl_init("https://api.telegram.org/bot" . TOKEN . "/sendMessage?chat_id=" . $cid . "&text=" . $m);
     curl_exec($ch);
     curl_close($ch);
 }
