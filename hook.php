@@ -13,6 +13,7 @@ $cmd_list = array(
     'nslookup (!群組)',
     'whois (!群組)',
     'test',
+    'cprteam',
     'help',
     'moo',
     'pull',
@@ -157,6 +158,10 @@ if($userName != ""){
                     git('log --pretty=format:"%h - %an, %ar : %s"');
                     break;
 
+                case "/cprteam":
+                    cprteam();
+                    break;
+
                 case "/burn":
                 case "/燒毀":
                     burn($dict);
@@ -222,6 +227,10 @@ function burn($burn_dict) {
 
     sendMsg($burn_dict[$index]);
 
+}
+
+function cprteam() {
+    sendMsg('不管有線無線，通通交給 CPR Team 就搞定了!');
 }
 
 function run_shell_cmd($cmd, $param, $do_sprint = true, $private = false) {
