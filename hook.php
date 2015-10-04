@@ -8,17 +8,17 @@ srand(time());
 include_once('config.php');
 
 $cmd_list = array(
-    'ping (!群組)',
-    'traceroute (!群組)',
-    'nslookup (!群組)',
-    'whois (!群組)',
+    'ping',
+    'traceroute',
+    'nslookup',
+    'whois',
     'test',
     'help',
     'moo',
     'pull',
     'status',
     'log',
-    'keygen (Message bot first)',
+    'keygen',
     'burn',
     '燒毀',
 );
@@ -50,10 +50,14 @@ $date = $data['message']['date'];
 $userName = $data['message']['from']['username'];
 $message = $data['message']['text'];
 
-if($userName != ""){
+// Skip user without telegram ID
+if( $userName != "" ){
     
+    // Is command
     if(substr($message, 0, 1) == "/") {
-        if( true ) { // For user check
+        
+	// Is not in SITCON group
+	if( !(intval($chatID) == -14362008 || $data['message']['chat'] == 'SITCON') ) { 
 
             $cmd = str_replace('@'.BOT_NAME, '', $message);
             $message = strtolower($message);
@@ -62,9 +66,6 @@ if($userName != ""){
 
             switch ($cmd[0]) {
                 case "/ping":
-                    if(intval($chatID) < 0)
-                        break;
-
                     if(count($cmd) == 2){
                         ping($cmd[1]);  
                     }else{
@@ -72,17 +73,7 @@ if($userName != ""){
                     }
                     break;
 
-                /*case "/ping6":
-                    if(count($cmd) == 2){
-                        ping6($cmd[1]); 
-                    }else{
-                        error(4);
-                    }
-                    break;*/
-
                 case "/traceroute":
-                    if(intval($chatID) < 0)
-                        break;
                     if(count($cmd) == 2){
                         traceroute($cmd[1]);
                     }else{
@@ -90,17 +81,7 @@ if($userName != ""){
                     }
                     break;
 
-                /*case "/traceroute6":
-                    if(count($cmd) == 2){
-                        traceroute6($cmd[1]);
-                    }else{
-                        error(4);
-                    }
-                    break;*/
-                
                 case "/nslookup":
-                    if(intval($chatID) < 0)
-                        break;
                     if(count($cmd) == 3){
                         nslookup($cmd[1], $cmd[2]);
                     }if(count($cmd) == 2){
@@ -111,8 +92,6 @@ if($userName != ""){
                     break;
 
                 case "/whois":
-                    if(intval($chatID) < 0)
-                        break;
                     if(count($cmd) == 2){
                         whois($cmd[1]);
                     }else{
@@ -124,25 +103,12 @@ if($userName != ""){
                     test();
                     break;
 
-                case "/curl":
-                    curl($cmd[1]);
-                    //run_shell_cmd('curl %s', $cmd[1]);
-                    break;
-
                 case "/help":
                     help($cmd_list);
                     break;
 
-                /*case "/search":
-                    if(count($cmd) == 3){
-                        search($cmd[1], $cmd[2]);
-                    }else{
-                        error(4);
-                    }
-                    break;*/
-
                 case "/moo":
-		            moo();
+		    moo();
                     break;
 
                 case "/pull":
@@ -168,29 +134,28 @@ if($userName != ""){
 
                 default:
                     if(strpos($message, "@".BOT_NAME)){
-                        sendMsg("我沒這指令, 你想做什麼??");
+                        sendMsg("無此指令");
                     }
-                    //error(3);
                     break;
             }
 
-        }else{
-            error(2);
-        }
+        } else{
+       	    // In SITCON group
+            // Do nothing
+	}
     }
     else {
 
         // 訊息不是 / 開頭
-
-        if(strpos($message, "@".BOT_NAME) !== false){
-            sendMsg("嗨~ Tag 我幹嘛?");
-        }
-
-        if ( preg_match('/[Ss][Ii][Tt][Cc][Oo][Nn][f]{0,1}/',$message) === 1 && 
+	// SITCON 全大寫
+        if ( preg_match('/[Ss][Ii][Tt][Cc][Oo][Nn][f]{0,1}/',$message) === 1 &&
              preg_match('/SITCON/',$message) !== 1 ) {
-             $msg = '@' .$userName . PHP_EOL;
-             $msg = ' SITCON 全大寫！';
-             sendMsg($msg);
+             if ( strpos(strtolower($message), 'sitcon.') === false && 
+		  strpos(strtolower($message), '#sitcon') === false  ) {
+                $msg = '@' .$userName . PHP_EOL;
+                $msg = ' SITCON 全大寫！';
+                sendMsg($msg);
+             }
         }
     }
 }
@@ -200,20 +165,6 @@ function keygen() {
     run_shell_cmd("ssh-keygen -t rsa -b 1024 -f /tmp/%s.key -N ''", $uniq);
     run_shell_cmd("cat /tmp/%s.key.pub", $uniq);
     run_shell_cmd("cat /tmp/%s.key", $uniq, true, true);
-}
-
-function curl($url) {
-
-    if( filter_var($url, FILTER_VALIDATE_URL) ) {
-
-        //run_shell_cmd('curl %s', $url);
-        sendMsg('維修中...');
-
-    } else {
-
-        error(4);
-        
-    }
 }
 
 function burn($burn_dict) {
@@ -258,21 +209,6 @@ function ping($host) {
     }
 }
 
-function ping6($host) {
-
-    if( filter_var($host, FILTER_VALIDATE_IP) ||
-        filter_var(gethostbyname($host), FILTER_VALIDATE_IP) ||
-        is_domain($host)) {
-
-        run_shell_cmd('timeout 30 /bin/ping6 -c 4 %s', $host);
-
-    } else {
-
-        error(4);
-        
-    }
-}
-
 function traceroute($host)  {
 
     if( filter_var($host, FILTER_VALIDATE_IP) ||
@@ -286,22 +222,6 @@ function traceroute($host)  {
         error(4);
         
     }
-}
-
-function traceroute6($host) {
-
-    if( filter_var($host, FILTER_VALIDATE_IP) ||
-        filter_var(gethostbyname($host), FILTER_VALIDATE_IP) ||
-        is_domain($host)) {
-
-        run_shell_cmd("timeout 30 /usr/bin/traceroute6 -n -w 15 %s | grep -vi '* * *'", $host);
-
-    } else {
-
-        error(4);
-        
-    }
-
 }
 
 function nslookup($host, $server = "8.8.8.8") {
@@ -350,7 +270,7 @@ function test(){
 }
 
 function help($cmd_list){
-    $str = 'Available Command' . "\n";
+    $str = 'Available Commands' . "\n(以下指令不適用於群組內)\n\n";
     foreach( $cmd_list as $cmd ) {
         $str .= "/$cmd\n";
     }
