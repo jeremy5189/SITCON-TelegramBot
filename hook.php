@@ -181,7 +181,7 @@ function burn($burn_dict) {
 }
 
 function cprteam() {
-    sendMsg('不管有線無線，通通交給 CPR Team 就搞定了!');
+    sendMsg('不管有線無線，通通交給 CPRTeam 就搞定了!');
 }
 
 function run_shell_cmd($cmd, $param, $do_sprint = true, $private = false) {
