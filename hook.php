@@ -14,6 +14,7 @@ $cmd_list = array(
     'moo',
     'burn',
     'url',
+    'uptime',
     '燒毀',
 );
 
@@ -56,9 +57,16 @@ $message = $data['message']['text'];
 // Skip user without telegram ID
 if( $userName != "" ) {
     
+    // ---------------
     // SITCON 全大寫
-    if ( preg_match('/[Ss][Ii][Tt][Cc][Oo][Nn][f]{0,1}/',$message) === 1 &&
-         preg_match('/SITCON/',$message) !== 1 ) {
+    // ---------------
+
+    // Remove SITCON
+    $message = str_replace('SITCON', '', $message);
+
+    logging('Got msg: '. $message);
+
+    if ( preg_match('/([^\\.]|^)(s[Ii][Tt][Cc][Oo][Nn]|[sS]i[Tt][Cc][Oo][Nn]|[sS][Ii]t[Cc][Oo][Nn]|[sS][Ii][Tt]c[Oo][Nn]|[sS][Ii][Tt][Cc]o[Nn]|[sS][Ii][Tt][Cc][Oo]n)([^a-zA-Z.]|$)/', $message) === 1 ) {
 
         if ( strpos(strtolower($message), 'sitcon.') === false && 
              strpos(strtolower($message), '#sitcon') === false  ) {
@@ -69,6 +77,7 @@ if( $userName != "" ) {
 
         }
     }
+
 
     // Is command
     if( substr($message, 0, 1) == "/" ) {
@@ -102,13 +111,10 @@ if( $userName != "" ) {
                     burn($dict);
                     break;
 
-                case "/keygen":
-                    keygen();
-                    break;
-
-                default:
-                    sendMsg("無此指令");
-                    break;
+        		case "/uptime":
+        		    uptime();
+        		    break;
+                
             }
 
         } 
@@ -154,10 +160,15 @@ function run_shell_cmd($cmd, $param, $do_sprint = true, $private = false) {
         sendPrivateMsg($msg);
     else
         sendMsg($msg);
+
 }
 
 function moo() {
     run_shell_cmd('apt-get moo');
+}
+
+function uptime() {
+    run_shell_cmd('uptime');
 }
 
 function test(){
