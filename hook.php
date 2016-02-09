@@ -61,12 +61,9 @@ if( $userName != "" ) {
     // SITCON 全大寫
     // ---------------
 
-    // Remove SITCON
-    $message = str_replace('SITCON', '', $message);
-
-    logging('Got msg: '. $message);
-
     if ( preg_match('/([^\\.]|^)(s[Ii][Tt][Cc][Oo][Nn]|[sS]i[Tt][Cc][Oo][Nn]|[sS][Ii]t[Cc][Oo][Nn]|[sS][Ii][Tt]c[Oo][Nn]|[sS][Ii][Tt][Cc]o[Nn]|[sS][Ii][Tt][Cc][Oo]n)([^a-zA-Z.]|$)/', $message) === 1 ) {
+
+	logging('Dealing with SITCON: ' . $message);
 
         if ( strpos(strtolower($message), 'sitcon.') === false && 
              strpos(strtolower($message), '#sitcon') === false  ) {
