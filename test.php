@@ -10,8 +10,8 @@ $case = array(
 	'SITCON sitcon' => 1,
 	'fjeaioewSITCONfajewi' => 0,
 	'fjiawejfiawejsiconfajewiofjeiow' => 0,
-    '今年sitcon也是要在irc的#sitcon上嗎？' => 1,
-    '今年SITCON也是要在irc的#sitcon上嗎？' => 0,
+	'今年sitcon也是要在irc的#sitcon上嗎？' => 1,
+	'今年SITCON也是要在irc的#sitcon上嗎？' => 0,
 );
 
 foreach( $case as $message => $expect ) {
