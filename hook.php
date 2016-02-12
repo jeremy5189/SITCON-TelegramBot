@@ -61,18 +61,14 @@ if( $userName != "" ) {
     // SITCON 全大寫
     // ---------------
 
-    if ( preg_match('/([^\\.]|^)(s[Ii][Tt][Cc][Oo][Nn]|[sS]i[Tt][Cc][Oo][Nn]|[sS][Ii]t[Cc][Oo][Nn]|[sS][Ii][Tt]c[Oo][Nn]|[sS][Ii][Tt][Cc]o[Nn]|[sS][Ii][Tt][Cc][Oo]n)([^a-zA-Z.]|$)/', $message) === 1 ) {
+    if ( preg_match('/([^\\.#]|^)(s[Ii][Tt][Cc][Oo][Nn]|[sS]i[Tt][Cc][Oo][Nn]|[sS][Ii]t[Cc][Oo][Nn]|[sS][Ii][Tt]c[Oo][Nn]|[sS][Ii][Tt][Cc]o[Nn]|[sS][Ii][Tt][Cc][Oo]n)([^a-zA-Z.]|$)/', $message) === 1 ) {
 
-	logging('Dealing with SITCON: ' . $message);
+	    logging('Dealing with SITCON: ' . $message);
 
-        if ( strpos(strtolower($message), 'sitcon.') === false && 
-             strpos(strtolower($message), '#sitcon') === false  ) {
-                
-            $msg = '@' .$userName . ' ';
-            $msg .= $sitcon_cap[rand(0, count($sitcon_cap)-1)];
-            sendMsg($msg);
+        $msg = '@' .$userName . ' ';
+        $msg .= $sitcon_cap[rand(0, count($sitcon_cap)-1)];
+        sendMsg($msg);
 
-        }
     }
 
 
