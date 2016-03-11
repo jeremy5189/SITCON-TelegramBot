@@ -33,7 +33,8 @@ $sitcon_cap = array(
 	'叭叭！抓到了！SITCON 沒全大寫！',
 	'逼逼！SITCON 沒全大寫！請退選！',
 	'叭叭！SITCON 沒全大寫！這樣對嗎？',
-	'抓到了齁，SITCON 沒大寫'
+	'抓到了齁，SITCON 沒大寫',
+	'Make SITCON great again'
 );
 
 // Get telegram data
@@ -80,10 +81,10 @@ if( $userName != "" ) {
         logging($cmd);
         $cmd = split(' ', $cmd);
 
-	    if($cmd[0] == '/url') {
-            sendMsg('SITCON group link: http://j.mp/SITCONtg');
-	    }
-        else if( !(intval($chatID) == -14362008) ) { 
+	if($cmd[0] == '/url') {
+            sendMsg('SITCON group link: http://sitcon.org/tg');
+	}
+        else if( !(intval($chatID) == -1001033025246) ) { 
 
             switch ($cmd[0]) {
 
