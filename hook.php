@@ -62,7 +62,7 @@ if( $userName != "" ) {
     // SITCON 全大寫
     // ---------------
 
-    if ( preg_match('/([^\\.#]|^)(s[Ii][Tt][Cc][Oo][Nn]|[sS]i[Tt][Cc][Oo][Nn]|[sS][Ii]t[Cc][Oo][Nn]|[sS][Ii][Tt]c[Oo][Nn]|[sS][Ii][Tt][Cc]o[Nn]|[sS][Ii][Tt][Cc][Oo]n)([^a-zA-Z.]|$)/', $message) === 1 ) {
+    if ( preg_match('/([^\\.#]|^)(?!SITCON)([sS][iI][tT][cC][oO][nN])([^a-zA-Z.]|$)/', $message) === 1 ) {
 
 	logging('Dealing with SITCON: ' . $message);
 
